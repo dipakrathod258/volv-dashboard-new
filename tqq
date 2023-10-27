@@ -1,0 +1,53 @@
+[1mdiff --git a/app/Http/Controllers/ArticleController.php b/app/Http/Controllers/ArticleController.php[m
+[1mindex 38aec76..8c5c8fc 100644[m
+[1m--- a/app/Http/Controllers/ArticleController.php[m
+[1m+++ b/app/Http/Controllers/ArticleController.php[m
+[36m@@ -1390,10 +1390,44 @@[m [mclass ArticleController extends Controller[m
+         [m
+         $polls = ArticlePoll::all();[m
+ [m
+[31m-        $data = DB::select('select count(option_selected) as poll_result from article_polls left join poll_results on poll_results.poll_id = article_polls.id[m
+[31m-        where 1=1[m
+[31m-        group by option_selected');[m
+[31m-        // dd($data);[m
+[32m+[m[32m        $data = DB::select("SELECT article_polls.*, poll_id, option_selected, count(*) as count FROM volv.poll_results[m
+[32m+[m[32m                            join article_polls[m
+[32m+[m[32m                            on article_polls.id = poll_results.poll_id[m
+[32m+[m[32m                            where option_selected='option1' group by poll_id[m
+[32m+[m[32m                            UNION ALL[m
+[32m+[m[32m                            SELECT article_polls.*,poll_id ,option_selected, count(*) as count FROM volv.poll_results[m[41m [m
+[32m+[m[32m                            join article_polls[m
+[32m+[m[32m                            on article_polls.id = poll_results.poll_id[m
+[32m+[m[32m                            where option_selected='option2' group by poll_id;[m
+[32m+[m[32m                            ");[m
+[32m+[m
+[32m+[m[32m        $poll_bucket=[];[m
+[32m+[m[32m        foreach($data as $key =>  $poll ) {[m
+[32m+[m
+[32m+[m[32m            if($poll->option_selected=="option1") {[m
+[32m+[m[32m                $poll_bucket[$key][$poll->poll_id]["poll_question"]= $poll->poll_question;[m
+[32m+[m[32m                $poll_bucket[$key][$poll->poll_id]["option1"]= $poll->option1;[m
+[32m+[m[32m                $poll_bucket[$key][$poll->poll_id]["option2"]= $poll->option2;[m
+[32m+[m
+[32m+[m[32m                $poll_bucket[$key][$poll->poll_id]["poll_image"]= $poll->poll_image;[m
+[32m+[m[32m                $poll_bucket[$key][$poll->poll_id]["date"]= $poll->created_at;[m
+[32m+[m[32m                $poll_bucket[$key][$poll->poll_id]["left_color"]= $poll->left_color;[m
+[32m+[m[32m                $poll_bucket[$key][$poll->poll_id]["right_color"]= $poll->right_color;[m
+[32m+[m[32m                $poll_bucket[$key][$poll->poll_id]["option_selected"]= $poll->option_selected;[m
+[32m+[m[32m                // $poll_bucket[$key][$poll->poll_id]["option1"]= $poll->count;[m
+[32m+[m[32m            }[m
+[32m+[m[32m            else {[m
+[32m+[m[32m                $poll_bucket[$key][$poll->poll_id]["poll_question"]= $poll->poll_question;[m
+[32m+[m[32m                $poll_bucket[$key][$poll->poll_id]["option2"]= $poll->option2;[m
+[32m+[m
+[32m+[m[32m                $poll_bucket[$key][$poll->poll_id]["poll_image"]= $poll->poll_image;[m
+[32m+[m[32m                $poll_bucket[$key][$poll->poll_id]["date"]= $poll->created_at;[m
+[32m+[m[32m                $poll_bucket[$key][$poll->poll_id]["left_color"]= $poll->left_color;[m
+[32m+[m[32m                $poll_bucket[$key][$poll->poll_id]["right_color"]= $poll->right_color;[m
+[32m+[m[32m                $poll_bucket[$key][$poll->poll_id]["option_selected"]= $poll->option_selected;[m
+[32m+[m[32m            }[m
+[32m+[m[32m        }[m
+[32m+[m[32m        dd($poll_bucket);[m
+         return view("articles.view_polls", compact('polls'));[m
+     }[m
+     [m
