@@ -861,6 +861,25 @@ class ArticleController extends Controller
             // ==== Calling Autolikes API ends
 
 
+                // Calling Create And Save Audio starts
+    
+                $data_to_post = [
+                    "articleId" => $article->id,
+                    "articleHeading" => $article->article_heading,
+                    "articleSummary" => $article->article_summary,
+                    "deleteExisting" => false,
+                ];
+        
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL,"https://server.volvmedia.com/v1/createAndSaveAudio");
+                curl_setopt($ch, CURLOPT_POST, 1);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data_to_post));
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                $response = curl_exec($ch);
+                curl_close ($ch);
+    
+                // Calling Create And Save Audio ENDS
+            
 
             $auth_id = auth()->user()->id;
             $article_id = $article->id;
@@ -1184,6 +1203,28 @@ if($request->additional_bias == "center") {
             $article_summary = $request->article_summary;
             $aritlce_status = Article::select('article_status')->where('id', $article_id)->first();
             $article_status = $aritlce_status->article_status;
+
+                // Calling Create And Save Audio starts
+    
+                $data_to_post = [
+                    "articleId" => $article->id,
+                    "articleHeading" => $article_heading,
+                    "articleSummary" => $article_summary,
+                    "deleteExisting" => true,
+                ];
+        
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL,"https://server.volvmedia.com/v1/createAndSaveAudio");
+                curl_setopt($ch, CURLOPT_POST, 1);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data_to_post));
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                $response = curl_exec($ch);
+                curl_close ($ch);
+    
+                // Calling Create And Save Audio ENDS
+
+
+
             $response = self::ArticleAuthorHistory($article_id, $auth_id, $article_heading, $article_summary, $article_status, $notification_text_history,$created_at, $updated_at);
             if($response["status"]=="success") {
 
