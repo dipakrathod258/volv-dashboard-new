@@ -1927,6 +1927,24 @@ if($request->additional_bias == "center") {
             }
 
             if($poll->save()) {
+                // Calling Create And Save Audio starts for Poll
+
+                $data_to_post = [
+                    "pollId" => $poll->id,
+                    "pollQuestion" => $poll_question->poll_question,
+                    "deleteExisting" => false
+                ];
+
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL,"https://server.volvmedia.com/v1/createAndSaveAudio");
+                curl_setopt($ch, CURLOPT_POST, 1);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data_to_post));
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                $response = curl_exec($ch);
+                curl_close ($ch);
+
+                // Calling Create And Save Audio ENDS for Polls
+
                 $response["status"] = "success";
             }
             else {
